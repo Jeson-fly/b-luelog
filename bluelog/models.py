@@ -34,7 +34,8 @@ class Post(db.Model):
     category_id = db.Column(db.Integer, db.ForeignKey("category.id"))
     category = db.relationship("Category", back_populates='posts')
 
-    comments = db.relationship("Comment",back_populates='post',cascade='all,delete-orphan')
+    comments = db.relationship("Comment", back_populates='post', cascade='all,delete-orphan')
+
 
 # 创建评论模型
 class Comment(db.Model):

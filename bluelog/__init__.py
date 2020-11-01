@@ -16,7 +16,7 @@ from bluelog.blueprints.auth import auth_bp
 from bluelog.blueprints.blog import blog_bp
 from bluelog.settings import config
 from bluelog.extensions import db, mail, moment, bootstrap, ckeditor
-
+from bluelog.models import Admin,Category
 
 def create_app(config_name=None):
     if not config_name:
@@ -67,7 +67,11 @@ def register_shell_context(app):
 
 # 注册模板上下文处理函数
 def register_tempalte_context(app):
-    pass
+    @app.context_processor
+    def make_template_context():
+        admin = Admin.query.first()
+        categories=Category.query.order_by(Category.name).all()
+        return dict(admin=admin,categories=categories)
 
 
 # 注册扩展程序
