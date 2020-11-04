@@ -9,14 +9,15 @@
 '''
 
 from flask import Blueprint
+from flask_login import login_required
 
 admin_bp = Blueprint('admin', __name__)
 
 
 @admin_bp.before_request
-def get_user():
-    print("admin应用，验证用户")
-    return None
+@login_required
+def login_protect():
+    pass
 
 @admin_bp.route("/index", methods=["GET"])
 def index():

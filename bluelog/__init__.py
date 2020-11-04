@@ -15,9 +15,11 @@ from bluelog.blueprints.admin import admin_bp
 from bluelog.blueprints.auth import auth_bp
 from bluelog.blueprints.blog import blog_bp
 from bluelog.settings import config
-from bluelog.extensions import db, mail, moment, bootstrap, ckeditor
-from bluelog.models import Admin,Category
+from bluelog.extensions import db, mail, moment, bootstrap, ckeditor, login_manager, csrf
+from bluelog.models import Admin, Category
 
+
+# 工厂函数
 def create_app(config_name=None):
     if not config_name:
         config_name = os.getenv('FLASK_CONFIG', "development")
@@ -31,6 +33,7 @@ def create_app(config_name=None):
     register_shell_context(app)  # 注册shell上下文处理函数
     register_tempalte_context(app)  # 注册模板上下文处理函数
     return app
+
 
 # 注册shell命令
 def register_commands(app):
@@ -70,8 +73,8 @@ def register_tempalte_context(app):
     @app.context_processor
     def make_template_context():
         admin = Admin.query.first()
-        categories=Category.query.order_by(Category.name).all()
-        return dict(admin=admin,categories=categories)
+        categories = Category.query.order_by(Category.name).all()
+        return dict(admin=admin, categories=categories)
 
 
 # 注册扩展程序
@@ -81,6 +84,8 @@ def register_extensions(app):
     mail.init_app(app)
     bootstrap.init_app(app)
     ckeditor.init_app(app)
+    login_manager.init_app(app)
+    csrf.init_app(app)
 
 
 # 注册蓝图函数
