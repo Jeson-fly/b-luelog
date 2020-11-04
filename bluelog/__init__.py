@@ -10,13 +10,16 @@
 import os
 
 import click
-from flask import Flask
+from flask import Flask, redirect, render_template
+from flask_login import current_user
+from flask_wtf.csrf import CSRFError
+
 from bluelog.blueprints.admin import admin_bp
 from bluelog.blueprints.auth import auth_bp
 from bluelog.blueprints.blog import blog_bp
 from bluelog.settings import config
 from bluelog.extensions import db, mail, moment, bootstrap, ckeditor, login_manager, csrf
-from bluelog.models import Admin, Category
+from bluelog.models import Admin, Category, Comment
 
 
 # 工厂函数
@@ -74,7 +77,15 @@ def register_tempalte_context(app):
     def make_template_context():
         admin = Admin.query.first()
         categories = Category.query.order_by(Category.name).all()
-        return dict(admin=admin, categories=categories)
+        if current_user.is_authenticated:
+            unread_comments=Comment.query.filter_by(reviewed=False).count
+        else:
+            unread_comments=None
+        return dict(
+            admin=admin,
+            categories=categories,
+            unread_comments=unread_comments,
+        )
 
 
 # 注册扩展程序
@@ -97,4 +108,18 @@ def register_blueprints(app):
 
 # 注册错误模板函数
 def register_errors(app):
-    pass
+    @app.errorhandler(400)
+    def bad_request(e):
+        return render_template("errors/400.html"), 400
+
+    @app.errorhandler(404)
+    def page_not_found(e):
+        return render_template("errors/404.html"), 404
+
+    @app.errorhandler(500)
+    def internal_server_error(e):
+        return render_template('errors/500.html'), 500
+
+    @app.errorhandler(CSRFError)
+    def handle_csrf_error(e):
+        return render_template('errors/400.html', description=e.description), 400

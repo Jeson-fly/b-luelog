@@ -19,7 +19,7 @@ from flask_ckeditor import CKEditorField
 # 登陆表单
 class LoginForm(FlaskForm):
     username = wtf.StringField('Username', validators=[DataRequired(), Length(1, 20)])
-    password = wtf.PasswordField('Password', validators=[DataRequired(), Length[8, 128]])
+    # password = wtf.PasswordField('Password', validators=[DataRequired(), Length[1, 128]])
     remember = wtf.BooleanField('Remember me')
     submit = wtf.SubmitField('Login')
 
@@ -61,4 +61,9 @@ class AdminCommentForm(CommentForm):
     email = wtf.HiddenField()
     site = wtf.HiddenField()
 
-#
+class SettingForm(FlaskForm):
+    name = wtf.StringField('Name', validators=[DataRequired(), Length(1, 30)])
+    blog_title = wtf.StringField('Blog Title', validators=[DataRequired(), Length(1, 60)])
+    blog_sub_title = wtf.StringField('Blog Sub Title', validators=[DataRequired(), Length(1, 100)])
+    about = CKEditorField('About Page', validators=[DataRequired()])
+    submit = wtf.SubmitField()
